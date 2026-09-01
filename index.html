@@ -1,235 +1,317 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Anonymous Message</title>
+<title>Anonymous Chat</title>
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+<style>
+* {
+  box-sizing: border-box;
+}
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      padding: 20px;
-      font-family: Arial, sans-serif;
+body {
+  margin: 0;
+  height: 100vh;
+  font-family: Arial, sans-serif;
+  background: #d7dbd5;
+  display: flex;
+  justify-content: center;
+}
 
-      background:
-        radial-gradient(circle at top left, #ffd6e7, transparent 35%),
-        radial-gradient(circle at bottom right, #d8e7ff, transparent 35%),
-        #fafafa;
+.app {
+  width: 100%;
+  max-width: 500px;
+  height: 100vh;
+  background: #efeae2;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
 
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
+/* Header */
 
-    .card {
-      width: 100%;
-      max-width: 400px;
-      padding: 32px 25px;
-      background: rgba(255,255,255,.94);
-      border-radius: 24px;
-      box-shadow: 0 15px 50px rgba(0,0,0,.12);
-      text-align: center;
-    }
+.header {
+  height: 65px;
+  background: #075e54;
+  color: white;
+  display: flex;
+  align-items: center;
+  padding: 10px 15px;
+  gap: 12px;
+}
 
-    .icon {
-      width: 70px;
-      height: 70px;
-      margin: auto auto 15px;
-      border-radius: 50%;
+.avatar {
+  width: 43px;
+  height: 43px;
+  border-radius: 50%;
+  background: #128c7e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+}
 
-      display: flex;
-      align-items: center;
-      justify-content: center;
+.header-text {
+  flex: 1;
+}
 
-      font-size: 32px;
-      color: white;
+.header-title {
+  font-size: 16px;
+  font-weight: bold;
+}
 
-      background: linear-gradient(
-        135deg,
-        #833ab4,
-        #fd1d1d,
-        #fcb045
-      );
-    }
+.header-status {
+  font-size: 12px;
+  opacity: .8;
+  margin-top: 3px;
+}
 
-    h1 {
-      margin: 0;
-      font-size: 27px;
-    }
+/* Chat */
 
-    .subtitle {
-      color: #777;
-      font-size: 14px;
-      line-height: 21px;
-      margin: 10px 0 22px;
-    }
+.chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px 10px 90px;
 
-    input,
-    textarea {
-      width: 100%;
-      border: 1px solid #ddd;
-      border-radius: 12px;
-      padding: 13px;
-      margin-bottom: 12px;
+  background-color: #efeae2;
 
-      font-size: 14px;
-      font-family: inherit;
-      outline: none;
-      background: #fafafa;
-    }
+  background-image:
+    radial-gradient(
+      rgba(0,0,0,.035) 1px,
+      transparent 1px
+    );
 
-    textarea {
-      height: 120px;
-      resize: none;
-    }
+  background-size: 12px 12px;
+}
 
-    input:focus,
-    textarea:focus {
-      border-color: #9b59b6;
-      background: white;
-    }
+/* Bubbles */
 
-    button {
-      width: 100%;
-      border: none;
-      border-radius: 12px;
-      padding: 13px;
+.message {
+  display: flex;
+  margin: 5px 0;
+}
 
-      font-size: 15px;
-      font-weight: bold;
-      color: white;
+.message.received {
+  justify-content: flex-start;
+}
 
-      background: linear-gradient(
-        135deg,
-        #833ab4,
-        #fd1d1d,
-        #fcb045
-      );
+.message.sent {
+  justify-content: flex-end;
+}
 
-      cursor: pointer;
-    }
+.bubble {
+  max-width: 78%;
+  padding: 8px 10px 6px;
+  border-radius: 8px;
+  font-size: 14px;
+  line-height: 20px;
+  position: relative;
+  word-wrap: break-word;
+}
 
-    button:disabled {
-      opacity: .5;
-    }
+.received .bubble {
+  background: white;
+  border-top-left-radius: 2px;
+}
 
-    #status {
-      min-height: 20px;
-      margin-top: 14px;
-      font-size: 13px;
-    }
+.sent .bubble {
+  background: #d9fdd3;
+  border-top-right-radius: 2px;
+}
 
-    .success {
-      color: #16803c;
-    }
+.time {
+  font-size: 10px;
+  color: #667781;
+  text-align: right;
+  margin-top: 3px;
+}
 
-    .error {
-      color: #d93025;
-    }
+/* Welcome */
 
-    #conversation {
-      display: none;
-      margin-top: 25px;
-      text-align: left;
-    }
+.welcome {
+  text-align: center;
+  margin: 15px auto 25px;
+  max-width: 300px;
+}
 
-    .reply {
-      background: #f1f1f1;
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 10px;
-      font-size: 14px;
-      line-height: 20px;
-    }
+.welcome span {
+  background: #fff3c4;
+  padding: 6px 10px;
+  border-radius: 7px;
+  font-size: 11px;
+  color: #667781;
+}
 
-    .reply-title {
-      font-size: 12px;
-      color: #777;
-      margin-bottom: 4px;
-    }
+/* Composer */
 
-    .credit {
-      position: fixed;
-      right: 15px;
-      bottom: 12px;
-      font-size: 11px;
-      color: rgba(0,0,0,.45);
-    }
-  </style>
+.composer {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  padding: 8px;
+
+  background: #f0f2f5;
+
+  display: flex;
+  gap: 7px;
+  align-items: center;
+}
+
+.name {
+  position: absolute;
+  bottom: 65px;
+  left: 10px;
+  right: 10px;
+}
+
+.name input {
+  width: 100%;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 15px;
+  outline: none;
+}
+
+.message-input {
+  flex: 1;
+  border: none;
+  border-radius: 22px;
+  padding: 12px 15px;
+  font-size: 14px;
+  outline: none;
+  resize: none;
+  max-height: 100px;
+}
+
+.send {
+  width: 45px;
+  height: 45px;
+  border: none;
+  border-radius: 50%;
+  background: #075e54;
+  color: white;
+  font-size: 19px;
+  cursor: pointer;
+}
+
+.send:disabled {
+  opacity: .5;
+}
+
+.credit {
+  position: fixed;
+  bottom: 4px;
+  right: 7px;
+  font-size: 9px;
+  color: rgba(0,0,0,.35);
+}
+
+/* Mobile */
+
+@media (max-width: 500px) {
+
+  .app {
+    max-width: none;
+  }
+
+}
+</style>
 </head>
 
 <body>
 
-  <div class="card">
+<div class="app">
 
-    <div class="icon">💌</div>
+  <div class="header">
 
-    <h1>Send Me a Message</h1>
-
-    <div class="subtitle">
-      Say whatever you want.<br>
-      Your message can be sent anonymously.
+    <div class="avatar">
+      💬
     </div>
 
-    <form id="messageForm">
+    <div class="header-text">
 
-      <input
-        id="name"
-        type="text"
-        maxlength="50"
-        placeholder="Your name (optional)"
-      >
+      <div class="header-title">
+        Anonymous Chat
+      </div>
+
+      <div class="header-status">
+        Send a message anonymously
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="chat" id="chat">
+
+    <div class="welcome">
+      <span>
+        🔒 Messages are anonymous
+      </span>
+    </div>
+
+  </div>
+
+
+  <form id="form">
+
+    <div class="composer">
 
       <textarea
         id="message"
-        maxlength="2000"
-        placeholder="Write your message..."
+        class="message-input"
+        placeholder="Message"
+        rows="1"
         required
       ></textarea>
 
-      <button id="sendButton" type="submit">
-        Send Message
+      <button
+        class="send"
+        id="send"
+        type="submit"
+      >
+        ➤
       </button>
 
-    </form>
-
-    <div id="status"></div>
-
-    <div id="conversation">
-      <strong>💬 Reply</strong>
-      <div id="replies"></div>
     </div>
 
-  </div>
+  </form>
 
-  <div class="credit">
-    Created by Gourab
-  </div>
+</div>
+
+<div class="credit">
+  Created by Gourab
+</div>
 
 
 <script>
 
-const form = document.getElementById("messageForm");
-const nameInput = document.getElementById("name");
-const messageInput = document.getElementById("message");
-const button = document.getElementById("sendButton");
-const status = document.getElementById("status");
-const conversation = document.getElementById("conversation");
-const replies = document.getElementById("replies");
+const chat =
+  document.getElementById("chat");
+
+const form =
+  document.getElementById("form");
+
+const message =
+  document.getElementById("message");
+
+const send =
+  document.getElementById("send");
 
 
 /*
-  Give this visitor a random anonymous session ID.
-  It does NOT contain their name or personal information.
+ Create anonymous browser session.
 */
 
-let sessionId = localStorage.getItem("anonymous_session");
+let sessionId =
+  localStorage.getItem(
+    "anonymous_session"
+  );
 
 if (!sessionId) {
 
@@ -240,131 +322,203 @@ if (!sessionId) {
     "anonymous_session",
     sessionId
   );
+
 }
-
-
-/* Send message */
-
-form.addEventListener("submit", async function(event) {
-
-  event.preventDefault();
-
-  const name = nameInput.value.trim();
-  const message = messageInput.value.trim();
-
-  if (!message) return;
-
-  button.disabled = true;
-  button.textContent = "Sending...";
-  status.textContent = "";
-
-  try {
-
-    const response = await fetch("/message", {
-
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json"
-      },
-
-      body: JSON.stringify({
-        sessionId: sessionId,
-        name: name,
-        message: message
-      })
-
-    });
-
-    const data = await response.json();
-
-    if (response.ok && data.success) {
-
-      messageInput.value = "";
-
-      status.textContent =
-        "Message sent! You can stay here for a reply.";
-
-      status.className = "success";
-
-      conversation.style.display = "block";
-
-    } else {
-
-      status.textContent =
-        data.error || "Couldn't send the message.";
-
-      status.className = "error";
-
-    }
-
-  } catch (error) {
-
-    status.textContent =
-      "Something went wrong. Please try again.";
-
-    status.className = "error";
-
-  }
-
-  button.disabled = false;
-  button.textContent = "Send Message";
-
-});
 
 
 /*
-  Check for replies every 3 seconds.
+ Escape HTML.
 */
 
-async function checkReplies() {
+function escapeHTML(text) {
+
+  const div =
+    document.createElement("div");
+
+  div.textContent = text;
+
+  return div.innerHTML;
+
+}
+
+
+/*
+ Add bubble.
+*/
+
+function addMessage(
+  text,
+  type,
+  time
+) {
+
+  const wrapper =
+    document.createElement("div");
+
+  wrapper.className =
+    "message " + type;
+
+
+  const bubble =
+    document.createElement("div");
+
+  bubble.className =
+    "bubble";
+
+
+  bubble.innerHTML = `
+    <div>
+      ${escapeHTML(text)}
+    </div>
+
+    <div class="time">
+      ${time || ""}
+    </div>
+  `;
+
+
+  wrapper.appendChild(bubble);
+
+  chat.appendChild(wrapper);
+
+  chat.scrollTop =
+    chat.scrollHeight;
+
+}
+
+
+/*
+ Load complete conversation.
+*/
+
+async function loadMessages() {
 
   try {
 
-    const response = await fetch(
-      "/replies/" + encodeURIComponent(sessionId)
-    );
+    const response =
+      await fetch(
+        "/conversation/" +
+        encodeURIComponent(sessionId)
+      );
 
     if (!response.ok) return;
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
-    if (!data.replies || data.replies.length === 0) {
-      return;
-    }
 
-    conversation.style.display = "block";
+    chat.innerHTML = `
+      <div class="welcome">
+        <span>
+          🔒 Messages are anonymous
+        </span>
+      </div>
+    `;
 
-    replies.innerHTML = "";
 
-    data.replies.forEach(reply => {
+    data.messages.forEach(item => {
 
-      const box = document.createElement("div");
-
-      box.className = "reply";
-
-      box.innerHTML = `
-        <div class="reply-title">💬 Reply</div>
-        <div></div>
-      `;
-
-      box.querySelector("div:last-child")
-        .textContent = reply;
-
-      replies.appendChild(box);
+      addMessage(
+        item.text,
+        item.sender === "visitor"
+          ? "sent"
+          : "received",
+        item.time
+      );
 
     });
 
+
+    chat.scrollTop =
+      chat.scrollHeight;
+
+
   } catch (error) {
 
-    console.log("Reply check failed");
+    console.log(error);
 
   }
 
 }
 
 
-setInterval(checkReplies, 3000);
+/*
+ Send message.
+*/
+
+form.addEventListener(
+  "submit",
+  async function(event) {
+
+    event.preventDefault();
+
+    const text =
+      message.value.trim();
+
+    if (!text) return;
+
+
+    send.disabled = true;
+
+
+    try {
+
+      const response =
+        await fetch("/message", {
+
+          method: "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+
+            sessionId,
+            message: text
+
+          })
+
+        });
+
+
+      if (response.ok) {
+
+        message.value = "";
+
+        await loadMessages();
+
+      }
+
+    } catch (error) {
+
+      console.log(error);
+
+    }
+
+
+    send.disabled = false;
+
+  }
+);
+
+
+/*
+ Check for new replies.
+*/
+
+setInterval(
+  loadMessages,
+  3000
+);
+
+
+/*
+ Initial load.
+*/
+
+loadMessages();
 
 </script>
 

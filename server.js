@@ -6,38 +6,26 @@ const app = express();
 app.use(express.json());
 app.use(express.static(__dirname));
 
-const BOT_TOKEN = process.env.BOT_TOKEN;
-const CHAT_ID = process.env.CHAT_ID;
 
-
-/*
-  Temporary message storage.
-
-  sessionId -> {
-    telegramMessageId,
-    replies: []
-  }
-*/
+// ==========================================
+// TEMPORARY CONVERSATION STORAGE
+// ==========================================
 
 const conversations = new Map();
 
 
-/*
-  Website
-*/
+// ==========================================
+// HOME PAGE
+// ==========================================
 
 app.get("/", (req, res) => {
-
-  res.sendFile(
-    path.join(__dirname, "index.html")
-  );
-
+  res.sendFile(path.join(__dirname, "index.html"));
 });
 
 
-/*
-  Visitor sends a message
-*/
+// ==========================================
+// SEND MESSAGE FROM WEBSITE
+// ==========================================
 
 app.post("/message", async (req, res) => {
 
@@ -51,57 +39,90 @@ app.post("/message", async (req, res) => {
     String(req.body.message || "").trim();
 
 
-  if (!sessionId || !message) {
-
+  if (!sessionId) {
     return res.status(400).json({
       success: false,
-      error: "Message is incomplete"
+      error: "Session ID is missing"
     });
-
   }
+
+
+  if (!message) {
+    return res.status(400).json({
+      success: false,
+      error: "Message is empty"
+    });
+  }
+
+
+  // Create conversation if it doesn't exist
+
+  if (!conversations.has(sessionId)) {
+    conversations.set(sessionId, []);
+  }
+
+
+  const conversation =
+    conversations.get(sessionId);
+
+
+  // ========================================
+  // SAVE VISITOR MESSAGE FIRST
+  // ========================================
+
+  conversation.push({
+    text: message,
+    sender: "visitor",
+    time: new Date().toISOString()
+  });
 
 
   try {
 
-    const telegramText =
-`📩 New Anonymous Message
+    // ======================================
+    // SEND MESSAGE TO TELEGRAM
+    // ======================================
 
-👤 Name: ${name || "Anonymous"}
+    const telegramResponse =
+      await fetch(
+        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/sendMessage`,
+        {
+          method: "POST",
 
-💬 Message:
-${message}
+          headers: {
+            "Content-Type": "application/json"
+          },
 
-↩️ Reply to THIS Telegram message to reply to the sender.`;
+          body: JSON.stringify({
 
+            chat_id: process.env.CHAT_ID,
 
-    const response = await fetch(
-      `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`,
-      {
+            text:
+              "📩 New Anonymous Message\n\n" +
+              "👤 Name: " +
+              name +
+              "\n\n" +
+              "💬 Message:\n" +
+              message +
+              "\n\n" +
+              "↩️ Reply to THIS Telegram message to reply to the sender.",
 
-        method: "POST",
-
-        headers: {
-          "Content-Type": "application/json"
-        },
-
-        body: JSON.stringify({
-
-          chat_id: CHAT_ID,
-
-          text: telegramText
-
-        })
-
-      }
-    );
-
-
-    const data = await response.json();
+          })
+        }
+      );
 
 
-    if (!response.ok || !data.ok) {
+    const telegramData =
+      await telegramResponse.json();
 
-      console.error(data);
+
+    if (!telegramResponse.ok ||
+        !telegramData.ok) {
+
+      console.error(
+        "Telegram error:",
+        telegramData
+      );
 
       return res.status(500).json({
         success: false,
@@ -111,19 +132,28 @@ ${message}
     }
 
 
+    // ======================================
+    // SAVE TELEGRAM MESSAGE ID
+    // ======================================
+
     const telegramMessageId =
-      data.result.message_id;
+      telegramData.result.message_id;
 
 
-    conversations.set(sessionId, {
+    conversation[conversation.length - 1]
+      .telegramMessageId =
+      telegramMessageId;
 
-      telegramMessageId:
-        telegramMessageId,
 
-      replies: []
+    // Save mapping for Telegram replies
 
-    });
+    conversation.telegramMessageId =
+      telegramMessageId;
 
+
+    // ======================================
+    // SUCCESS
+    // ======================================
 
     res.json({
       success: true
@@ -132,7 +162,10 @@ ${message}
 
   } catch (error) {
 
-    console.error(error);
+    console.error(
+      "Server error:",
+      error
+    );
 
     res.status(500).json({
       success: false,
@@ -144,76 +177,113 @@ ${message}
 });
 
 
-/*
-  Visitor checks for your replies
-*/
+// ==========================================
+// GET CONVERSATION
+// ==========================================
 
-app.get("/replies/:sessionId", (req, res) => {
+app.get("/conversation/:sessionId", (req, res) => {
 
   const sessionId =
-    String(req.params.sessionId);
+    String(req.params.sessionId || "").trim();
 
 
-  const conversation =
-    conversations.get(sessionId);
-
-
-  if (!conversation) {
+  if (!sessionId) {
 
     return res.json({
-      replies: []
+      messages: []
     });
 
   }
 
 
+  const conversation =
+    conversations.get(sessionId) || [];
+
+
+  // Remove internal mapping property
+
+  const messages =
+    conversation.filter(
+      item =>
+        item &&
+        typeof item.text === "string"
+    );
+
+
+  res.setHeader(
+    "Cache-Control",
+    "no-store"
+  );
+
+
   res.json({
-    replies: conversation.replies
+    messages
   });
 
 });
 
 
-/*
-  Telegram update polling
-*/
+// ==========================================
+// TELEGRAM REPLY CHECKER
+// ==========================================
+//
+// This checks Telegram for replies.
+// When you reply to the Telegram message,
+// the reply is sent back to the correct
+// anonymous visitor.
+// ==========================================
 
-let lastUpdateId = 0;
+let telegramOffset = 0;
 
 
-async function checkTelegram() {
+async function checkTelegramReplies() {
+
+  if (!process.env.BOT_TOKEN) {
+    return;
+  }
+
 
   try {
 
-    const response = await fetch(
-      `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?timeout=10&offset=${lastUpdateId + 1}`
-    );
+    const response =
+      await fetch(
+        `https://api.telegram.org/bot${process.env.BOT_TOKEN}/getUpdates?offset=${telegramOffset}&timeout=5`
+      );
 
 
-    const data = await response.json();
+    const data =
+      await response.json();
 
 
-    if (!data.ok || !data.result) {
+    if (!data.ok) {
+
+      console.error(
+        "Telegram getUpdates error:",
+        data
+      );
+
       return;
+
     }
 
 
     for (const update of data.result) {
 
-      lastUpdateId = update.update_id;
+      telegramOffset =
+        update.update_id + 1;
 
 
       const message =
         update.message;
 
 
-      if (!message) continue;
+      if (!message) {
+        continue;
+      }
 
 
-      /*
-        We only process replies to messages
-        previously sent by this server.
-      */
+      // We only care about messages
+      // that are replies.
 
       if (!message.reply_to_message) {
         continue;
@@ -224,42 +294,30 @@ async function checkTelegram() {
         message.reply_to_message.message_id;
 
 
-      for (const [sessionId, conversation]
-        of conversations.entries()) {
+      // ====================================
+      // FIND WHICH VISITOR SENT THAT MESSAGE
+      // ====================================
+
+      let foundSessionId = null;
 
 
-        if (
-          conversation.telegramMessageId
-          === repliedToId
-        ) {
+      for (
+        const [sessionId, conversation]
+        of conversations.entries()
+      ) {
 
-          const replyText =
-            String(message.text || "").trim();
-
-
-          if (!replyText) continue;
-
-
-          conversation.replies.push(
-            replyText
+        const found =
+          conversation.some(
+            item =>
+              item.telegramMessageId ===
+              repliedToId
           );
 
 
-          /*
-            Keep only the latest 20 replies.
-          */
+        if (found) {
 
-          if (conversation.replies.length > 20) {
-
-            conversation.replies.shift();
-
-          }
-
-
-          console.log(
-            "Reply delivered to session:",
-            sessionId
-          );
+          foundSessionId =
+            sessionId;
 
           break;
 
@@ -267,13 +325,53 @@ async function checkTelegram() {
 
       }
 
+
+      if (!foundSessionId) {
+        continue;
+      }
+
+
+      const conversation =
+        conversations.get(
+          foundSessionId
+        );
+
+
+      // ====================================
+      // SAVE GOURAB'S REPLY
+      // ====================================
+
+      conversation.push({
+
+        text:
+          String(
+            message.text || ""
+          ),
+
+        sender:
+          "owner",
+
+        time:
+          new Date(
+            message.date * 1000
+          ).toISOString()
+
+      });
+
+
+      console.log(
+        "Owner reply received for session:",
+        foundSessionId
+      );
+
     }
+
 
   } catch (error) {
 
     console.error(
       "Telegram polling error:",
-      error.message
+      error
     );
 
   }
@@ -281,30 +379,31 @@ async function checkTelegram() {
 }
 
 
-/*
-  Poll Telegram regularly.
-*/
+// ==========================================
+// CHECK TELEGRAM EVERY 2 SECONDS
+// ==========================================
 
 setInterval(
-  checkTelegram,
-  3000
+  checkTelegramReplies,
+  2000
 );
 
 
-/*
-  Start server
-*/
+// ==========================================
+// SERVER
+// ==========================================
 
 const PORT =
   process.env.PORT || 3000;
 
 
-app.listen(PORT, () => {
+app.listen(
+  PORT,
+  () => {
 
-  console.log(
-    `Server running on port ${PORT}`
-  );
+    console.log(
+      `Server running on port ${PORT}`
+    );
 
-  checkTelegram();
-
-});
+  }
+);

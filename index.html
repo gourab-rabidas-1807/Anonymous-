@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Anonymous Message</title>
+</head>
+
+<body>
+
+  <h1>Send me an anonymous message</h1>
+
+  <form id="messageForm">
+
+    <textarea
+      id="message"
+      placeholder="Write your message..."
+      required
+    ></textarea>
+
+    <br><br>
+
+    <button type="submit">Send</button>
+
+  </form>
+
+  <p id="status"></p>
+
+  <script>
+    const form = document.getElementById("messageForm");
+    const message = document.getElementById("message");
+    const status = document.getElementById("status");
+
+    form.addEventListener("submit", async function(event) {
+
+      event.preventDefault();
+
+      const text = message.value.trim();
+
+      if (!text) return;
+
+      try {
+
+        const response = await fetch("/message", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            message: text
+          })
+        });
+
+        if (response.ok) {
+          message.value = "";
+          status.textContent = "Message sent!";
+        } else {
+          status.textContent = "Failed to send message.";
+        }
+
+      } catch (error) {
+
+        status.textContent = "Something went wrong.";
+
+      }
+
+    });
+  </script>
+
+</body>
+</html>

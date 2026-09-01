@@ -5,8 +5,8 @@ const app = express();
 app.use(express.json());
 app.use(express.static("."));
 
-const BOT_TOKEN = "8878514370:AAEdLsm7iLcIOj4S4_7kavHHe0fvQOC1toY";
-const CHAT_ID = "7449188324";
+const BOT_TOKEN = process.env.BOT_TOKEN;
+const CHAT_ID = process.env.CHAT_ID;
 
 app.post("/message", async (req, res) => {
   const message = String(req.body.message || "").trim();

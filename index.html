@@ -3,33 +3,202 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Anonymous Message</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #fafafa;
+      font-family: Arial, Helvetica, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #262626;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 390px;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #dbdbdb;
+      padding: 35px 35px 30px;
+      text-align: center;
+    }
+
+    .logo {
+      font-family: cursive;
+      font-size: 38px;
+      font-weight: bold;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      color: #737373;
+      font-size: 14px;
+      line-height: 20px;
+      margin-bottom: 25px;
+    }
+
+    textarea {
+      width: 100%;
+      height: 130px;
+      resize: none;
+      border: 1px solid #dbdbdb;
+      border-radius: 6px;
+      background: #fafafa;
+      padding: 12px;
+      font-size: 14px;
+      outline: none;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    textarea:focus {
+      border-color: #a8a8a8;
+      background: white;
+    }
+
+    textarea::placeholder {
+      color: #8e8e8e;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 14px;
+      border: none;
+      border-radius: 7px;
+      padding: 10px;
+      background: #0095f6;
+      color: white;
+      font-size: 14px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:active {
+      opacity: 0.7;
+    }
+
+    button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    #status {
+      min-height: 20px;
+      margin: 14px 0 0;
+      font-size: 13px;
+    }
+
+    .success {
+      color: #16883e;
+    }
+
+    .error {
+      color: #d93025;
+    }
+
+    .footer-card {
+      background: white;
+      border: 1px solid #dbdbdb;
+      margin-top: 10px;
+      padding: 20px;
+      text-align: center;
+      font-size: 14px;
+      color: #737373;
+    }
+
+    .small {
+      font-size: 12px;
+      color: #999;
+      margin-top: 22px;
+      line-height: 17px;
+    }
+
+    @media (max-width: 430px) {
+      body {
+        align-items: flex-start;
+        padding-top: 45px;
+      }
+
+      .container {
+        padding: 10px;
+      }
+
+      .card {
+        border: none;
+      }
+
+      .footer-card {
+        border: none;
+      }
+    }
+  </style>
 </head>
 
 <body>
 
-  <h1>Send me an anonymous message</h1>
+  <div class="container">
 
-  <form id="messageForm">
+    <div class="card">
 
-    <textarea
-      id="message"
-      placeholder="Write your message..."
-      required
-    ></textarea>
+      <div class="logo">
+        Anonymous
+      </div>
 
-    <br><br>
+      <div class="subtitle">
+        Send me a message anonymously.
+        <br>
+        I won't know who sent it.
+      </div>
 
-    <button type="submit">Send</button>
+      <form id="messageForm">
 
-  </form>
+        <textarea
+          id="message"
+          maxlength="1000"
+          placeholder="Write a message..."
+          required
+        ></textarea>
 
-  <p id="status"></p>
+        <button id="sendButton" type="submit">
+          Send
+        </button>
+
+      </form>
+
+      <p id="status"></p>
+
+      <div class="small">
+        Your message is sent privately.
+      </div>
+
+    </div>
+
+    <div class="footer-card">
+      Want to send another message? 💬
+    </div>
+
+  </div>
+
 
   <script>
+
     const form = document.getElementById("messageForm");
     const message = document.getElementById("message");
+    const button = document.getElementById("sendButton");
     const status = document.getElementById("status");
+
 
     form.addEventListener("submit", async function(event) {
 
@@ -37,34 +206,65 @@
 
       const text = message.value.trim();
 
-      if (!text) return;
+      if (!text) {
+        status.textContent = "Please write a message.";
+        status.className = "error";
+        return;
+      }
+
+
+      button.disabled = true;
+      button.textContent = "Sending...";
+      status.textContent = "";
+
 
       try {
 
         const response = await fetch("/message", {
+
           method: "POST",
+
           headers: {
             "Content-Type": "application/json"
           },
+
           body: JSON.stringify({
             message: text
           })
+
         });
 
-        if (response.ok) {
+
+        const data = await response.json();
+
+
+        if (response.ok && data.success) {
+
           message.value = "";
+
           status.textContent = "Message sent!";
+          status.className = "success";
+
         } else {
-          status.textContent = "Failed to send message.";
+
+          status.textContent = "Couldn't send the message.";
+          status.className = "error";
+
         }
 
       } catch (error) {
 
-        status.textContent = "Something went wrong.";
+        status.textContent = "Something went wrong. Try again.";
+        status.className = "error";
 
       }
 
+
+      button.disabled = false;
+      button.textContent = "Send";
+
     });
+
   </script>
 
 </body>

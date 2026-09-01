@@ -14,201 +14,307 @@
     body {
       margin: 0;
       min-height: 100vh;
-      background: #fafafa;
       font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(circle at top left, #ffd6e7, transparent 35%),
+        radial-gradient(circle at bottom right, #d8e7ff, transparent 35%),
+        #fafafa;
+
       display: flex;
       justify-content: center;
       align-items: center;
-      color: #262626;
-    }
-
-    .container {
-      width: 100%;
-      max-width: 390px;
       padding: 20px;
     }
 
     .card {
-      background: white;
-      border: 1px solid #dbdbdb;
-      padding: 35px 35px 30px;
+      width: 100%;
+      max-width: 400px;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 24px;
+      padding: 32px 25px;
+      box-shadow: 0 15px 50px rgba(0,0,0,0.12);
       text-align: center;
     }
 
-    .logo {
-      font-family: cursive;
-      font-size: 38px;
-      font-weight: bold;
-      margin-bottom: 10px;
-      letter-spacing: -1px;
+    .icon {
+      width: 70px;
+      height: 70px;
+      margin: 0 auto 15px;
+
+      border-radius: 50%;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      font-size: 32px;
+
+      background: linear-gradient(
+        135deg,
+        #833ab4,
+        #fd1d1d,
+        #fcb045
+      );
+
+      color: white;
+      box-shadow: 0 8px 25px rgba(131,58,180,0.3);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 27px;
+      color: #222;
     }
 
     .subtitle {
-      color: #737373;
+      margin: 10px 0 25px;
+      color: #777;
       font-size: 14px;
-      line-height: 20px;
-      margin-bottom: 25px;
+      line-height: 21px;
     }
 
+    input,
     textarea {
       width: 100%;
-      height: 130px;
-      resize: none;
-      border: 1px solid #dbdbdb;
-      border-radius: 6px;
+      border: 1px solid #ddd;
       background: #fafafa;
-      padding: 12px;
+      border-radius: 12px;
+      padding: 13px;
       font-size: 14px;
       outline: none;
-      font-family: Arial, Helvetica, sans-serif;
+      margin-bottom: 12px;
     }
 
+    input:focus,
     textarea:focus {
-      border-color: #a8a8a8;
+      border-color: #a855f7;
       background: white;
     }
 
-    textarea::placeholder {
-      color: #8e8e8e;
+    textarea {
+      height: 130px;
+      resize: none;
+      font-family: inherit;
+    }
+
+    .photo-box {
+      border: 1.5px dashed #ccc;
+      border-radius: 14px;
+      padding: 14px;
+      margin-bottom: 14px;
+      background: #fafafa;
+    }
+
+    .photo-label {
+      display: block;
+      cursor: pointer;
+      color: #555;
+      font-size: 14px;
+      font-weight: bold;
+    }
+
+    .photo-label span {
+      display: block;
+      font-size: 25px;
+      margin-bottom: 5px;
+    }
+
+    #photo {
+      display: none;
+    }
+
+    #preview {
+      display: none;
+      max-width: 100%;
+      max-height: 180px;
+      margin: 12px auto 0;
+      border-radius: 12px;
     }
 
     button {
       width: 100%;
-      margin-top: 14px;
-      border: none;
-      border-radius: 7px;
-      padding: 10px;
-      background: #0095f6;
-      color: white;
-      font-size: 14px;
+      border: 0;
+      border-radius: 12px;
+      padding: 13px;
+      font-size: 15px;
       font-weight: bold;
+      color: white;
       cursor: pointer;
+
+      background: linear-gradient(
+        135deg,
+        #833ab4,
+        #fd1d1d,
+        #fcb045
+      );
+
+      transition: transform .15s, opacity .15s;
     }
 
     button:active {
-      opacity: 0.7;
+      transform: scale(.97);
+      opacity: .8;
     }
 
     button:disabled {
-      opacity: 0.5;
+      opacity: .5;
       cursor: not-allowed;
     }
 
     #status {
       min-height: 20px;
-      margin: 14px 0 0;
+      margin-top: 15px;
       font-size: 13px;
     }
 
     .success {
-      color: #16883e;
+      color: #16803c;
     }
 
     .error {
       color: #d93025;
     }
 
-    .footer-card {
-      background: white;
-      border: 1px solid #dbdbdb;
-      margin-top: 10px;
-      padding: 20px;
-      text-align: center;
-      font-size: 14px;
-      color: #737373;
-    }
-
-    .small {
-      font-size: 12px;
+    .privacy {
+      margin-top: 18px;
       color: #999;
-      margin-top: 22px;
+      font-size: 11px;
       line-height: 17px;
     }
 
-    @media (max-width: 430px) {
-      body {
-        align-items: flex-start;
-        padding-top: 45px;
-      }
+    .credit {
+      position: fixed;
+      bottom: 12px;
+      right: 15px;
 
-      .container {
-        padding: 10px;
-      }
-
-      .card {
-        border: none;
-      }
-
-      .footer-card {
-        border: none;
-      }
+      font-size: 11px;
+      color: rgba(0,0,0,.45);
     }
   </style>
 </head>
 
 <body>
 
-  <div class="container">
+  <div class="card">
 
-    <div class="card">
-
-      <div class="logo">
-        Anonymous
-      </div>
-
-      <div class="subtitle">
-        Send me a message anonymously.
-        <br>
-        I won't know who sent it.
-      </div>
-
-      <form id="messageForm">
-
-        <textarea
-          id="message"
-          maxlength="1000"
-          placeholder="Write a message..."
-          required
-        ></textarea>
-
-        <button id="sendButton" type="submit">
-          Send
-        </button>
-
-      </form>
-
-      <p id="status"></p>
-
-      <div class="small">
-        Your message is sent privately.
-      </div>
-
+    <div class="icon">
+      💌
     </div>
 
-    <div class="footer-card">
-      Want to send another message? 💬
+    <h1>Send Me a Message</h1>
+
+    <div class="subtitle">
+      Say whatever you want.<br>
+      Your message can be sent anonymously.
     </div>
 
+    <form id="messageForm">
+
+      <input
+        type="text"
+        id="name"
+        maxlength="50"
+        placeholder="Your name (optional)"
+      >
+
+      <textarea
+        id="message"
+        maxlength="2000"
+        placeholder="Write your message..."
+        required
+      ></textarea>
+
+      <div class="photo-box">
+
+        <label class="photo-label" for="photo">
+          <span>📷</span>
+          Add a photo (optional)
+        </label>
+
+        <input
+          type="file"
+          id="photo"
+          accept="image/*"
+          capture="environment"
+        >
+
+        <img id="preview" alt="Photo preview">
+
+      </div>
+
+      <button id="sendButton" type="submit">
+        Send Message
+      </button>
+
+    </form>
+
+    <div id="status"></div>
+
+    <div class="privacy">
+      Please only share information and photos you're comfortable
+      sending to the recipient.
+    </div>
+
+  </div>
+
+  <div class="credit">
+    Created by Gourab
   </div>
 
 
   <script>
 
     const form = document.getElementById("messageForm");
-    const message = document.getElementById("message");
+    const nameInput = document.getElementById("name");
+    const messageInput = document.getElementById("message");
+    const photoInput = document.getElementById("photo");
+    const preview = document.getElementById("preview");
     const button = document.getElementById("sendButton");
     const status = document.getElementById("status");
 
+
+    /* Photo preview */
+
+    photoInput.addEventListener("change", function() {
+
+      const file = this.files[0];
+
+      if (!file) {
+        preview.style.display = "none";
+        return;
+      }
+
+      if (!file.type.startsWith("image/")) {
+        alert("Please select an image.");
+        this.value = "";
+        return;
+      }
+
+      const url = URL.createObjectURL(file);
+
+      preview.src = url;
+      preview.style.display = "block";
+
+    });
+
+
+    /* Send */
 
     form.addEventListener("submit", async function(event) {
 
       event.preventDefault();
 
-      const text = message.value.trim();
+      const name = nameInput.value.trim();
+      const message = messageInput.value.trim();
+      const photo = photoInput.files[0];
 
-      if (!text) {
+
+      if (!message) {
+
         status.textContent = "Please write a message.";
         status.className = "error";
+
         return;
       }
 
@@ -220,17 +326,21 @@
 
       try {
 
+        const formData = new FormData();
+
+        formData.append("name", name);
+        formData.append("message", message);
+
+        if (photo) {
+          formData.append("photo", photo);
+        }
+
+
         const response = await fetch("/message", {
 
           method: "POST",
 
-          headers: {
-            "Content-Type": "application/json"
-          },
-
-          body: JSON.stringify({
-            message: text
-          })
+          body: formData
 
         });
 
@@ -240,28 +350,37 @@
 
         if (response.ok && data.success) {
 
-          message.value = "";
+          form.reset();
 
-          status.textContent = "Message sent!";
+          preview.src = "";
+          preview.style.display = "none";
+
+          status.textContent = "Message sent successfully! 💌";
           status.className = "success";
 
         } else {
 
-          status.textContent = "Couldn't send the message.";
+          status.textContent =
+            data.error || "Couldn't send the message.";
+
           status.className = "error";
 
         }
 
       } catch (error) {
 
-        status.textContent = "Something went wrong. Try again.";
+        console.error(error);
+
+        status.textContent =
+          "Something went wrong. Please try again.";
+
         status.className = "error";
 
       }
 
 
       button.disabled = false;
-      button.textContent = "Send";
+      button.textContent = "Send Message";
 
     });
 

@@ -483,11 +483,17 @@ async function startServer() {
       }
     );
 
-    // Check Telegram every 2 seconds.
-    setInterval(
-      checkTelegramReplies,
-      2000
-    );
+        // Check Telegram continuously, one request at a time.
+    async function telegramLoop() {
+      while (true) {
+        await checkTelegramReplies();
+        await new Promise(resolve =>
+          setTimeout(resolve, 1000)
+        );
+      }
+    }
+
+    telegramLoop();
 
   } catch (error) {
     console.error(

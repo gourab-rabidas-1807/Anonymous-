@@ -14,7 +14,9 @@
     body {
       margin: 0;
       min-height: 100vh;
-      font-family: Arial, Helvetica, sans-serif;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+
       background:
         radial-gradient(circle at top left, #ffd6e7, transparent 35%),
         radial-gradient(circle at bottom right, #d8e7ff, transparent 35%),
@@ -23,25 +25,22 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      padding: 20px;
     }
 
     .card {
       width: 100%;
       max-width: 400px;
-      background: rgba(255,255,255,0.92);
-      border: 1px solid rgba(0,0,0,0.08);
-      border-radius: 24px;
       padding: 32px 25px;
-      box-shadow: 0 15px 50px rgba(0,0,0,0.12);
+      background: rgba(255,255,255,.94);
+      border-radius: 24px;
+      box-shadow: 0 15px 50px rgba(0,0,0,.12);
       text-align: center;
     }
 
     .icon {
       width: 70px;
       height: 70px;
-      margin: 0 auto 15px;
-
+      margin: auto auto 15px;
       border-radius: 50%;
 
       display: flex;
@@ -49,6 +48,7 @@
       justify-content: center;
 
       font-size: 32px;
+      color: white;
 
       background: linear-gradient(
         135deg,
@@ -56,91 +56,54 @@
         #fd1d1d,
         #fcb045
       );
-
-      color: white;
-      box-shadow: 0 8px 25px rgba(131,58,180,0.3);
     }
 
     h1 {
       margin: 0;
       font-size: 27px;
-      color: #222;
     }
 
     .subtitle {
-      margin: 10px 0 25px;
       color: #777;
       font-size: 14px;
       line-height: 21px;
+      margin: 10px 0 22px;
     }
 
     input,
     textarea {
       width: 100%;
       border: 1px solid #ddd;
-      background: #fafafa;
       border-radius: 12px;
       padding: 13px;
-      font-size: 14px;
-      outline: none;
       margin-bottom: 12px;
+
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      background: #fafafa;
+    }
+
+    textarea {
+      height: 120px;
+      resize: none;
     }
 
     input:focus,
     textarea:focus {
-      border-color: #a855f7;
+      border-color: #9b59b6;
       background: white;
-    }
-
-    textarea {
-      height: 130px;
-      resize: none;
-      font-family: inherit;
-    }
-
-    .photo-box {
-      border: 1.5px dashed #ccc;
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 14px;
-      background: #fafafa;
-    }
-
-    .photo-label {
-      display: block;
-      cursor: pointer;
-      color: #555;
-      font-size: 14px;
-      font-weight: bold;
-    }
-
-    .photo-label span {
-      display: block;
-      font-size: 25px;
-      margin-bottom: 5px;
-    }
-
-    #photo {
-      display: none;
-    }
-
-    #preview {
-      display: none;
-      max-width: 100%;
-      max-height: 180px;
-      margin: 12px auto 0;
-      border-radius: 12px;
     }
 
     button {
       width: 100%;
-      border: 0;
+      border: none;
       border-radius: 12px;
       padding: 13px;
+
       font-size: 15px;
       font-weight: bold;
       color: white;
-      cursor: pointer;
 
       background: linear-gradient(
         135deg,
@@ -149,22 +112,16 @@
         #fcb045
       );
 
-      transition: transform .15s, opacity .15s;
-    }
-
-    button:active {
-      transform: scale(.97);
-      opacity: .8;
+      cursor: pointer;
     }
 
     button:disabled {
       opacity: .5;
-      cursor: not-allowed;
     }
 
     #status {
       min-height: 20px;
-      margin-top: 15px;
+      margin-top: 14px;
       font-size: 13px;
     }
 
@@ -176,18 +133,31 @@
       color: #d93025;
     }
 
-    .privacy {
-      margin-top: 18px;
-      color: #999;
-      font-size: 11px;
-      line-height: 17px;
+    #conversation {
+      display: none;
+      margin-top: 25px;
+      text-align: left;
+    }
+
+    .reply {
+      background: #f1f1f1;
+      border-radius: 14px;
+      padding: 12px;
+      margin-top: 10px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+
+    .reply-title {
+      font-size: 12px;
+      color: #777;
+      margin-bottom: 4px;
     }
 
     .credit {
       position: fixed;
-      bottom: 12px;
       right: 15px;
-
+      bottom: 12px;
       font-size: 11px;
       color: rgba(0,0,0,.45);
     }
@@ -198,9 +168,7 @@
 
   <div class="card">
 
-    <div class="icon">
-      💌
-    </div>
+    <div class="icon">💌</div>
 
     <h1>Send Me a Message</h1>
 
@@ -212,8 +180,8 @@
     <form id="messageForm">
 
       <input
-        type="text"
         id="name"
+        type="text"
         maxlength="50"
         placeholder="Your name (optional)"
       >
@@ -225,24 +193,6 @@
         required
       ></textarea>
 
-      <div class="photo-box">
-
-        <label class="photo-label" for="photo">
-          <span>📷</span>
-          Add a photo (optional)
-        </label>
-
-        <input
-          type="file"
-          id="photo"
-          accept="image/*"
-          capture="environment"
-        >
-
-        <img id="preview" alt="Photo preview">
-
-      </div>
-
       <button id="sendButton" type="submit">
         Send Message
       </button>
@@ -251,9 +201,9 @@
 
     <div id="status"></div>
 
-    <div class="privacy">
-      Please only share information and photos you're comfortable
-      sending to the recipient.
+    <div id="conversation">
+      <strong>💬 Reply</strong>
+      <div id="replies"></div>
     </div>
 
   </div>
@@ -263,128 +213,160 @@
   </div>
 
 
-  <script>
+<script>
 
-    const form = document.getElementById("messageForm");
-    const nameInput = document.getElementById("name");
-    const messageInput = document.getElementById("message");
-    const photoInput = document.getElementById("photo");
-    const preview = document.getElementById("preview");
-    const button = document.getElementById("sendButton");
-    const status = document.getElementById("status");
-
-
-    /* Photo preview */
-
-    photoInput.addEventListener("change", function() {
-
-      const file = this.files[0];
-
-      if (!file) {
-        preview.style.display = "none";
-        return;
-      }
-
-      if (!file.type.startsWith("image/")) {
-        alert("Please select an image.");
-        this.value = "";
-        return;
-      }
-
-      const url = URL.createObjectURL(file);
-
-      preview.src = url;
-      preview.style.display = "block";
-
-    });
+const form = document.getElementById("messageForm");
+const nameInput = document.getElementById("name");
+const messageInput = document.getElementById("message");
+const button = document.getElementById("sendButton");
+const status = document.getElementById("status");
+const conversation = document.getElementById("conversation");
+const replies = document.getElementById("replies");
 
 
-    /* Send */
+/*
+  Give this visitor a random anonymous session ID.
+  It does NOT contain their name or personal information.
+*/
 
-    form.addEventListener("submit", async function(event) {
+let sessionId = localStorage.getItem("anonymous_session");
 
-      event.preventDefault();
+if (!sessionId) {
 
-      const name = nameInput.value.trim();
-      const message = messageInput.value.trim();
-      const photo = photoInput.files[0];
+  sessionId =
+    crypto.randomUUID();
 
-
-      if (!message) {
-
-        status.textContent = "Please write a message.";
-        status.className = "error";
-
-        return;
-      }
-
-
-      button.disabled = true;
-      button.textContent = "Sending...";
-      status.textContent = "";
+  localStorage.setItem(
+    "anonymous_session",
+    sessionId
+  );
+}
 
 
-      try {
+/* Send message */
 
-        const formData = new FormData();
+form.addEventListener("submit", async function(event) {
 
-        formData.append("name", name);
-        formData.append("message", message);
+  event.preventDefault();
 
-        if (photo) {
-          formData.append("photo", photo);
-        }
+  const name = nameInput.value.trim();
+  const message = messageInput.value.trim();
 
+  if (!message) return;
 
-        const response = await fetch("/message", {
+  button.disabled = true;
+  button.textContent = "Sending...";
+  status.textContent = "";
 
-          method: "POST",
+  try {
 
-          body: formData
+    const response = await fetch("/message", {
 
-        });
+      method: "POST",
 
+      headers: {
+        "Content-Type": "application/json"
+      },
 
-        const data = await response.json();
-
-
-        if (response.ok && data.success) {
-
-          form.reset();
-
-          preview.src = "";
-          preview.style.display = "none";
-
-          status.textContent = "Message sent successfully! 💌";
-          status.className = "success";
-
-        } else {
-
-          status.textContent =
-            data.error || "Couldn't send the message.";
-
-          status.className = "error";
-
-        }
-
-      } catch (error) {
-
-        console.error(error);
-
-        status.textContent =
-          "Something went wrong. Please try again.";
-
-        status.className = "error";
-
-      }
-
-
-      button.disabled = false;
-      button.textContent = "Send Message";
+      body: JSON.stringify({
+        sessionId: sessionId,
+        name: name,
+        message: message
+      })
 
     });
 
-  </script>
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+
+      messageInput.value = "";
+
+      status.textContent =
+        "Message sent! You can stay here for a reply.";
+
+      status.className = "success";
+
+      conversation.style.display = "block";
+
+    } else {
+
+      status.textContent =
+        data.error || "Couldn't send the message.";
+
+      status.className = "error";
+
+    }
+
+  } catch (error) {
+
+    status.textContent =
+      "Something went wrong. Please try again.";
+
+    status.className = "error";
+
+  }
+
+  button.disabled = false;
+  button.textContent = "Send Message";
+
+});
+
+
+/*
+  Check for replies every 3 seconds.
+*/
+
+async function checkReplies() {
+
+  try {
+
+    const response = await fetch(
+      "/replies/" + encodeURIComponent(sessionId)
+    );
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+
+    if (!data.replies || data.replies.length === 0) {
+      return;
+    }
+
+    conversation.style.display = "block";
+
+    replies.innerHTML = "";
+
+    data.replies.forEach(reply => {
+
+      const box = document.createElement("div");
+
+      box.className = "reply";
+
+      box.innerHTML = `
+        <div class="reply-title">💬 Reply</div>
+        <div></div>
+      `;
+
+      box.querySelector("div:last-child")
+        .textContent = reply;
+
+      replies.appendChild(box);
+
+    });
+
+  } catch (error) {
+
+    console.log("Reply check failed");
+
+  }
+
+}
+
+
+setInterval(checkReplies, 3000);
+
+</script>
 
 </body>
 </html>
